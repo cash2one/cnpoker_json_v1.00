@@ -1,0 +1,38 @@
+CC = g++
+CFLAGS = -g -fPIC -D_FILELINE -Wno-deprecated 
+HOME = /mnt/share/cnpoker_v20150803
+#HOME = /usr/local/moche_v20150728
+INC = -I $(HOME)/Common -I $(HOME)/Network -I $(HOME)/Utility -I $(HOME)/GameSrv 
+
+OBJS = Utility/Yond_mutex.o Utility/Yond_ini.o \
+       Common/InfoParser.o \
+       Network/Acceptor.o Network/Connector.o Network/IOCPServer.o Network/NetworkObject.o Network/Session.o \
+       Network/SessionList.o Network/SessionPool.o Network/SocketOpt.o Network/SyncHandler.o \
+       GameSrv/AgentServerSession.o GameSrv/DBServerSession.o \
+       GameSrv/GameFactory.o GameSrv/GameMain.o GameSrv/GameServer.o GameSrv/GameUser.o \
+       GameSrv/Handler_FromAgentServer.o GameSrv/Handler_FromDBServer.o GameSrv/PacketHandler.o \
+       GameSrv/ServerSession.o
+
+BINDIR = $(HOME)/bin
+
+all: checkbin $(BINDIR)/GameServer 
+
+$(BINDIR)/GameServer: $(OBJS)
+	$(CC) -g $^ -o $@ -pthread
+
+.SUFFIXES: .c .o .cpp
+.cpp.o:
+	$(CC) $(CFLAGS) $(INC) -o $@ -c $<
+
+.PHONY: checkbin
+checkbin:
+	test -d "${BINDIR}" || mkdir $(BINDIR)
+
+.PHONY:	clean
+clean:
+	rm -f Common/*.o
+	rm -f Network/*.o
+	rm -f Utility/*.o
+	rm -f GameSrv/*.o
+	rm -f $(BINDIR)/GameServer
+	
